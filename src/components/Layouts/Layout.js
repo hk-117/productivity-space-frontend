@@ -7,7 +7,7 @@ export default function Layout(props){
         <>
             <NavBar/>
                 {props.children}
-            <Footer/>
+            <Footer footerClass={props.footerClass}/>
         </>
     );
 }

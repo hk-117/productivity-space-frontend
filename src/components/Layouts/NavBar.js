@@ -1,6 +1,17 @@
 import React from "react";
 
 export default function NavBar(){
+    let isLogged = localStorage.getItem('isLogged');
+    const notLoggedItems = (
+        <>
+            <li className="nav-item">
+            <a className="nav-link" href="/register">Register</a>
+            </li>
+            <li className="nav-item">
+            <a className="nav-link" href="/login">LogIn</a>
+            </li>
+        </>
+        );
     return (
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid">
@@ -28,24 +39,23 @@ export default function NavBar(){
                     <li className="nav-item">
                     <a className="nav-link" href="/">Trips</a>
                     </li>
-                    <li className="nav-item">
-                    <a className="nav-link" href="/register">Register</a>
-                    </li>
-                    <li className="nav-item">
-                    <a className="nav-link" href="/">LogIn</a>
-                    </li>
-                    
-                    <li className="nav-item dropdown">
-                    <a className="nav-link dropdown-toggle" href="/" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Zubayer
-                    </a>
-                    <ul className="dropdown-menu">
-                        <li><a className="dropdown-item" href="/">Profile</a></li>
-                        <li><a className="dropdown-item" href="/">Settings</a></li>
-                        <li><hr className="dropdown-divider"/></li>
-                        <li><a className="dropdown-item" href="/">Logout</a></li>
-                    </ul>
-                    </li>
+                    {isLogged ?
+                     (<>
+                        <li className="nav-item dropdown">
+                        <a className="nav-link dropdown-toggle" href="/" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Zubayer
+                        </a>
+                        <ul className="dropdown-menu">
+                            <li><a className="dropdown-item" href="/">Profile</a></li>
+                            <li><a className="dropdown-item" href="/">Settings</a></li>
+                            <li><hr className="dropdown-divider"/></li>
+                            <li><a className="dropdown-item" href="/">Logout</a></li>
+                        </ul>
+                        </li>
+                    </>)
+                     : 
+                     notLoggedItems
+                     }
                 </ul>
                 <form className="d-flex" role="search">
                     <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
