@@ -1,5 +1,6 @@
 import React,{useState} from "react";
 import Layout from "../../Layouts/Layout";
+import axios from "axios";
 
 export default function Register(){
     const [firstname,setFirstName] = useState("");
@@ -25,7 +26,7 @@ export default function Register(){
         setPassword(e.target.value);
     }
 
-    function handleSubmit(e){
+    async function handleSubmit(e){
         e.preventDefault();
         console.log({
             firstname,
@@ -35,15 +36,30 @@ export default function Register(){
         });
         if(firstname.trim() && lastname.trim() && email.trim() && password.trim()){
             if(password.length >= 8){
-                alert("The form is submitted!");
-                setFirstName("");
-                setLastName("");
-                setEmail("");
-                setPassword("");
+                try{
+                    let result = await axios.post('http://localhost:3000/user/register',{
+                        first_name: firstname,
+                        last_name: lastname,
+                        email: email,
+                        password: password
+                    });
+                    console.log(result);
+                    if(result.status === 201){
+                        alert("Your account has been created! Try to Log In");
+                        setFirstName("");
+                        setLastName("");
+                        setEmail("");
+                        setPassword("");
+                        console.log(result.data);
+                    } else {
+                        alert("Error Occured");
+                    }
+                } catch (e){
+                    console.log(e);
+                }
             } else {
                 alert("Password Should be at least 8 characters.");
             }
-            
         } else {
             alert("Please fill up all the field with values");
         }
@@ -107,7 +123,7 @@ export default function Register(){
                         />
                         <label htmlFor="PassWord">Password should be &gt;= 8 chars</label>
                     </div>
-                    <button className="btn btn-success w-100 py-2" type="submit">Sign Up</button>
+                    <button className="btn btn-success w-100 py-2" type="submit" onSubmit={handleSubmit}>Sign Up</button>
                 </form>
             </main>
         </Layout>

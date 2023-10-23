@@ -1,5 +1,6 @@
 import React,{useState} from "react";
 import Layout from "../../Layouts/Layout";
+import axios from "axios";
 
 export default function Login(){
     const [email,setEmail] = useState("");
@@ -15,16 +16,30 @@ export default function Login(){
         setPassword(e.target.value);
     }
 
-    function handleSubmit(e){
+    async function handleSubmit(e){
         e.preventDefault();
         console.log({
             email,
             password
         });
         if(email.trim() && password.trim()){
-            alert("The form is submitted!");
-            setEmail("");
-            setPassword("");
+            try {
+                let result = await axios.post('http://localhost:3000/user/login',{
+                    email: email,
+                    password: password
+                });
+                if(result.status === 200){
+                    localStorage.setItem('Authorization', result.data.user.token);
+                    localStorage.setItem('isLogged',true);
+                    setEmail("");
+                    setPassword("");
+                    alert('Log In Successful');
+                } else {
+                    alert('Wrong Credentials');
+                }
+            } catch (error) {
+                console.log(error);
+            }
         } else {
             alert("Please fill up all the field with values");
         }
