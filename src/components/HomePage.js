@@ -1,14 +1,13 @@
 import React from "react";
 import NavBar from "./NavBar";
-import MainBody from "./MainBody";
 import Footer from "./Footer";
 
-export default function HomePage(){
+export default function HomePage(props){
     return (
         <div>
             <NavBar/>
-            <MainBody/>
+                <main>{props.children}</main>
             <Footer/>
         </div>
-    );  
+    );
 }
