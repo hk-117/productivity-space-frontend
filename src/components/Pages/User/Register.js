@@ -1,5 +1,6 @@
 import React,{useState} from "react";
 import Layout from "../../Layouts/Layout";
+import ValidationError from "../../Utility/ValidationError";
 import axios from "axios";
 
 export default function Register(){
@@ -7,34 +8,31 @@ export default function Register(){
     const [lastname,setLastName] = useState("");
     const [email,setEmail] = useState("");
     const [password,setPassword] = useState("");
+    const [message,setMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     let footerClass = "fixed-bottom";
 
     function handleFirstNameChange(e){
-        setFirstName(e.target.value);
+        setFirstName(e.target.value.trim());
     }
 
     function handleLastNameChange(e){
-        setLastName(e.target.value);
+        setLastName(e.target.value.trim());
     }
 
     function handleEmailChange(e){
-        setEmail(e.target.value);
+        setEmail(e.target.value.trim());
     }
 
     function handlePasswordChange(e){
-        setPassword(e.target.value);
+        setPassword(e.target.value.trim());
     }
 
     async function handleSubmit(e){
         e.preventDefault();
-        console.log({
-            firstname,
-            lastname,
-            email,
-            password
-        });
-        if(firstname.trim() && lastname.trim() && email.trim() && password.trim()){
+        setIsLoading(true);
+        if(firstname && lastname && email && password){
             if(password.length >= 8){
                 try{
                     let result = await axios.post('http://localhost:3000/user/register',{
@@ -43,26 +41,24 @@ export default function Register(){
                         email: email,
                         password: password
                     });
-                    console.log(result);
                     if(result.status === 201){
                         alert("Your account has been created! Try to Log In");
                         setFirstName("");
                         setLastName("");
                         setEmail("");
                         setPassword("");
-                        console.log(result.data);
-                    } else {
-                        alert("Error Occured");
+                        setMessage("");
                     }
                 } catch (e){
-                    console.log(e);
+                    setMessage(e.response.data.message);
                 }
             } else {
-                alert("Password Should be at least 8 characters.");
+                setMessage('SHORT_PASSWORD');
             }
         } else {
-            alert("Please fill up all the field with values");
+            setMessage('INCOMPLETE_FIELDS');
         }
+        setIsLoading(false);
     }
     
     return (
@@ -74,7 +70,7 @@ export default function Register(){
                     <div className="form-floating">
                         <input 
                             type="text" 
-                            className="form-control" 
+                            className={`form-control ${message==='INCOMPLETE_FIELDS'? 'is-invalid' : ''}`} 
                             id="FirstName" 
                             placeholder="First Name" 
                             name="first_name" 
@@ -83,11 +79,12 @@ export default function Register(){
                             required  
                         />
                         <label htmlFor="FirstName">First Name</label>
+                        {(message==='INCOMPLETE_FIELDS' && firstname.length===0) && <ValidationError message="Please, fill up with valid data." /> }
                     </div>
                     <div className="form-floating">
                         <input 
                             type="text" 
-                            className="form-control" 
+                            className={`form-control ${message==='INCOMPLETE_FIELDS'? 'is-invalid' : ''}`} 
                             id="LastName" 
                             placeholder="Last Name" 
                             name="last_name" 
@@ -96,11 +93,12 @@ export default function Register(){
                             required
                         />
                         <label htmlFor="LastName">Last Name</label>
+                        {(message==='INCOMPLETE_FIELDS' && lastname.length===0) && <ValidationError message="Please, fill up with valid data." /> }
                     </div>
                     <div className="form-floating">
                         <input 
                             type="email" 
-                            className="form-control" 
+                            className={`form-control ${['ALREADY_EXIST','INVALID_EMAIL','INCOMPLETE_FIELDS'].includes(message) ? 'is-invalid' : ''}`} 
                             id="Email" 
                             placeholder="example@email.com" 
                             name="email" 
@@ -109,11 +107,14 @@ export default function Register(){
                             required
                         />
                         <label htmlFor="Email">Email</label>
+                        {(message==='ALREADY_EXIST') && <ValidationError message="User with this email address already exists." /> }
+                        {(message==='INVALID_EMAIL') && <ValidationError message="Please, give a valid email address." /> }
+                        {(message==='INCOMPLETE_FIELDS' && email.length===0) && <ValidationError message="Please, fill up with valid data." /> }
                     </div>
                     <div className="form-floating">
                         <input 
                             type="password" 
-                            className="form-control" 
+                            className={`form-control ${['SHORT_PASSWORD','INCOMPLETE_FIELDS'].includes(message) ? 'is-invalid' : ''}`}
                             id="PassWord" 
                             placeholder="Password" 
                             name="password" 
@@ -121,10 +122,13 @@ export default function Register(){
                             onChange={handlePasswordChange}
                             required
                         />
-                        <label htmlFor="PassWord">Password should be &gt;= 8 chars</label>
+                        <label htmlFor="PassWord">Password</label>
+                        {(message==='SHORT_PASSWORD') && <ValidationError message="Password should be more than 8 characters." /> }
+                        {(message==='INCOMPLETE_FIELDS' && password.length===0) && <ValidationError message="Please, fill up with valid data." /> }
                     </div>
-                    <button className="btn btn-success w-100 py-2" type="submit" onSubmit={handleSubmit}>Sign Up</button>
+                    <button className={`btn btn-success w-100 py-2 ${isLoading? 'disabled' :''}`} type="submit" onSubmit={handleSubmit}>Sign Up</button>
                 </form>
+                {isLoading && (<div id="loadingSpinner" className="spinner-border text-primary" role="status"/>)}
             </main>
         </Layout>
     );

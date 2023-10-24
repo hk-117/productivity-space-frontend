@@ -1,10 +1,13 @@
 import React,{useState} from "react";
 import Layout from "../../Layouts/Layout";
+import ValidationError from "../../Utility/ValidationError";
 import axios from "axios";
 
 export default function Login(){
     const [email,setEmail] = useState("");
     const [password,setPassword] = useState("");
+    const [message,setMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     let footerClass = "fixed-bottom";
 
@@ -18,10 +21,7 @@ export default function Login(){
 
     async function handleSubmit(e){
         e.preventDefault();
-        console.log({
-            email,
-            password
-        });
+        setIsLoading(true);
         if(email.trim() && password.trim()){
             try {
                 let result = await axios.post('http://localhost:3000/user/login',{
@@ -33,14 +33,14 @@ export default function Login(){
                     localStorage.setItem('isLogged',true);
                     setEmail("");
                     setPassword("");
+                    setMessage("");
                     alert('Log In Successful');
                 }
             } catch (error) {
-                alert(error.response.data.message);
+                setMessage(error.response.data.message);
             }
-        } else {
-            alert("Please fill up all the field with values");
         }
+        setIsLoading(false);
     }
     return (
         <Layout footerClass={footerClass}>
@@ -51,7 +51,7 @@ export default function Login(){
                     <div className="form-floating">
                         <input 
                             type="email" 
-                            className="form-control" 
+                            className={`form-control ${message==='USER_NOT_FOUND'? 'is-invalid' : ''}`} 
                             id="Email" 
                             placeholder="example@email.com" 
                             name="email" 
@@ -60,11 +60,12 @@ export default function Login(){
                             required
                         />
                         <label htmlFor="Email">Email</label>
+                        {(message==='USER_NOT_FOUND') && <ValidationError message="User with this email address does not exist." /> }
                     </div>
                     <div className="form-floating">
                         <input 
                             type="password" 
-                            className="form-control" 
+                            className={`form-control ${message==='PASSWORD_MISMATCH'? 'is-invalid' : ''}`}  
                             id="PassWord" 
                             placeholder="Password" 
                             name="password" 
@@ -73,12 +74,14 @@ export default function Login(){
                             required
                         />
                         <label htmlFor="PassWord">Password</label>
+                        {(message==='PASSWORD_MISMATCH') && <ValidationError message="Wrong credentials." /> }
                     </div>
                     <div className="d-flex justify-content-around">
-                        <button className="btn btn-success w-40 py-2" type="submit">LogIn</button>
+                        <button className={`btn btn-success w-40 py-2 ${isLoading? 'disabled' :''}`} type="submit">LogIn</button>
                         <button className="btn btn-danger w-40 py-2">Forgot Password?</button>
                     </div>
                 </form>
+                {isLoading && (<div id="loadingSpinner" className="spinner-border text-primary" role="status"/>)}
             </main>
         </Layout>
     );
