@@ -12,6 +12,11 @@ export default function NavBar(){
             </li>
         </>
         );
+
+    function logOut(){
+        localStorage.clear();
+    }
+    
     return (
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid">
@@ -49,7 +54,7 @@ export default function NavBar(){
                             <li><a className="dropdown-item" href="/">Profile</a></li>
                             <li><a className="dropdown-item" href="/">Settings</a></li>
                             <li><hr className="dropdown-divider"/></li>
-                            <li><a className="dropdown-item" href="/">Logout</a></li>
+                            <li><a className="dropdown-item" onClick={logOut} href="/">Logout</a></li>
                         </ul>
                         </li>
                     </>)

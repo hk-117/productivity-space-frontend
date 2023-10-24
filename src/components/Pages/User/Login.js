@@ -34,11 +34,9 @@ export default function Login(){
                     setEmail("");
                     setPassword("");
                     alert('Log In Successful');
-                } else {
-                    alert('Wrong Credentials');
                 }
             } catch (error) {
-                console.log(error);
+                alert(error.response.data.message);
             }
         } else {
             alert("Please fill up all the field with values");
