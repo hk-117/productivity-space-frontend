@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 import Layout from "../../Layouts/Layout";
 import ValidationError from "../../Utility/ValidationError";
 import axios from "axios";
@@ -8,6 +8,13 @@ export default function Login(){
     const [password,setPassword] = useState("");
     const [message,setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [loginDone,setLoginDone] = useState(localStorage.getItem('isLogged'));
+
+    useEffect(()=>{
+        if(loginDone){
+            window.location.href='/';
+        }
+    },[loginDone]);
 
     let footerClass = "fixed-bottom";
 
@@ -34,7 +41,8 @@ export default function Login(){
                     setEmail("");
                     setPassword("");
                     setMessage("");
-                    alert('Log In Successful');
+                    setLoginDone(localStorage.getItem('isLogged'));
+                    setIsLoading(false);
                 }
             } catch (error) {
                 setMessage(error.response.data.message);
